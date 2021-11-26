@@ -17,8 +17,8 @@
 
 
 
-### Development Environment
-These are the versions tools which were used to develop the latest version of **ContextMenuCollectionView**:
+### Ambiente de desenvolvimento
+Estas são as versões das ferramentas que foram usadas para desenvolver ** ContextMenuCollectionView **:
 - **Xcode** 13.0
 - **Swift** 5.5
 - **iOS** 15.1.1
