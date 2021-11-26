@@ -13,7 +13,7 @@ class ViewController: UIViewController {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 2
-        layout.minimumInteritemSpacing = 2
+        layout.minimumInteritemSpacing = 1
         
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collection.backgroundColor = .systemGray6
@@ -28,6 +28,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(collectionView)
+        collectionView.delegate = self
         collectionView.dataSource = self
     }
     
@@ -35,7 +36,33 @@ class ViewController: UIViewController {
         super.viewDidLayoutSubviews()
         collectionView.frame = view.bounds
     }
-
+    
+    private func batteryPercentage() -> Int {
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        return Int(UIDevice.current.batteryLevel * 100)
+    }
+    
+    private func batteryImage(percentage: Int) -> UIImage {
+        var batteryImage: UIImage?
+        
+        if percentage == 100 {
+            batteryImage = UIImage(systemName: "battery.100")
+        } else if percentage > 50 && percentage < 100 {
+            batteryImage = UIImage(systemName: "battery.75")
+        } else if percentage > 25 && percentage < 51 {
+            batteryImage = UIImage(systemName: "battery.50")
+        } else if percentage > 1 && percentage < 26 {
+            batteryImage = UIImage(systemName: "battery.25")
+        } else {
+            batteryImage = UIImage(systemName: "battery.0")
+        }
+        
+        if UIDevice.current.batteryState == .charging {
+            batteryImage = UIImage(systemName: "battery.100.bolt")
+        }
+        
+        return batteryImage!
+    }
 }
 
 // MARK: - DELEGATES and DATASOURCE
@@ -80,11 +107,18 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegateFl
                 print("Tapped search")
             }
             
+            let battery = UIAction(title: "Battery Level", image: self?.batteryImage(percentage: (self?.batteryPercentage())!), state: .off) { [weak self] _ in
+                let alert = UIAlertController(title: "Battery Level", message: "\(String(describing: self?.batteryPercentage()))%", preferredStyle: .alert)
+                let ok = UIAlertAction(title: "Fechar", style: .default, handler: nil)
+                alert.addAction(ok)
+                self?.present(alert, animated: true)
+            }
+            
             return UIMenu(title: "Actions",
                           image: nil,
                           identifier: nil,
                           options: UIMenu.Options.displayInline,
-                          children: [copy, favorite, search]
+                          children: [copy, favorite, search, battery]
             )
         }
         
